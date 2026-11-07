@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'iot' => [
+    'device_token' => env('IOT_DEVICE_TOKEN'),
+    ],
+
 ];
