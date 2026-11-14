@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/iot/readings', [SensorReadingController::class, 'store']);
 Route::get('/iot/readings', [SensorReadingController::class, 'index']);
+Route::get('/iot/readings/latest', [SensorReadingController::class, 'latest']);
