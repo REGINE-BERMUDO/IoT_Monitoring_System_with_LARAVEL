@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SensorReading extends Model
 {
-    //
+    protected $fillable = [
+        'device_id',
+        'temperature',
+        'humidity',
+        'recorded_at',
+    ];
 }
