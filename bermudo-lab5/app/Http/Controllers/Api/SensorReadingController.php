@@ -50,4 +50,10 @@ class SensorReadingController extends Controller
             'data'    => $reading,
         ], 201);
     }
+    public function index()
+    {
+    return response()->json(
+        SensorReading::latest('id')->limit(20)->get()
+        );
+    }
 }
