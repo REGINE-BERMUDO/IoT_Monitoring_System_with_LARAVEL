@@ -56,4 +56,16 @@ class SensorReadingController extends Controller
         SensorReading::latest('id')->limit(20)->get()
         );
     }
+    public function latest()
+    {
+    $reading = SensorReading::latest('id')->first();
+
+    if (! $reading) {
+        return response()->json([
+            'message' => 'No sensor readings found.',
+        ], 404);
+    }
+
+    return response()->json($reading);
+    }
 }
