@@ -11,5 +11,14 @@ class SensorReading extends Model
         'temperature',
         'humidity',
         'recorded_at',
-    ];
+        ];
+
+    protected function casts(): array
+    {
+    return [
+        'temperature' => 'float',
+        'humidity' => 'float',
+        'recorded_at' => 'datetime',
+        ];
+    }
 }
