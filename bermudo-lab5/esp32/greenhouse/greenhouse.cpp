@@ -155,3 +155,21 @@ void initHardware() {
   dht.begin();
 #endif
 }
+
+void checkResetButton() {
+  if (digitalRead(RESET_BUTTON_PIN) == LOW) {
+    if (resetPressedAt == 0) {
+      resetPressedAt = millis();
+    } else if (millis() - resetPressedAt > RESET_HOLD_MS) {
+      Serial.println("Forgetting saved Wi-Fi. Release the BOOT button now...");
+      WiFiManager wm;
+      wm.resetSettings();
+      while (digitalRead(RESET_BUTTON_PIN) == LOW) {
+        delay(50);
+      }
+      ESP.restart();
+    }
+  } else {
+    resetPressedAt = 0;
+  }
+}
