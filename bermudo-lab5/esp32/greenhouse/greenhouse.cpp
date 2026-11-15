@@ -80,3 +80,70 @@ void syncTime() {
     Serial.println("NTP synchronization failed.");
   }
 }
+
+void sendReading() {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Wi-Fi disconnected.");
+    return;
+  }
+
+  if (deviceToken.length() == 0) {
+    Serial.println("No device token saved. Hold BOOT for 3 seconds to open setup again.");
+    return;
+  }
+
+#if USE_SIMULATED_DATA
+  float temperature = random(250, 331) / 10.0;   // 25.0 - 33.0
+  float humidity    = random(550, 851) / 10.0;   // 55.0 - 85.0
+#else
+  float temperature = dht.readTemperature();
+  float humidity    = dht.readHumidity();
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("Failed to read DHT sensor.");
+    return;
+  }
+#endif
+
+  struct tm timeinfo;
+  char timestamp[25];
+  if (!getLocalTime(&timeinfo, 2000)) {
+    Serial.println("Time not synchronized; reading skipped.");
+    return;
+  }
+  strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
+
+  String payload = "{";
+  payload += "\"device_id\":\"";
+  payload += DEVICE_ID;
+  payload += "\",\"temperature\":";
+  payload += String(temperature, 2);
+  payload += ",\"humidity\":";
+  payload += String(humidity, 2);
+  payload += ",\"recorded_at\":\"";
+  payload += timestamp;
+  payload += "\"}";
+
+  HTTPClient http;
+  http.setTimeout(5000);
+  http.begin(serverUrl);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Accept", "application/json");
+  http.addHeader("Authorization", "Bearer " + deviceToken);
+
+  int httpCode = http.POST(payload);
+
+  Serial.print("Temperature: ");
+  Serial.println(temperature);
+  Serial.print("Humidity: ");
+  Serial.println(humidity);
+  Serial.print("HTTP status: ");
+  Serial.println(httpCode);
+
+  if (httpCode > 0) {
+    Serial.println(http.getString());
+  } else {
+    Serial.println(http.errorToString(httpCode));
+  }
+
+  http.end();
+}
