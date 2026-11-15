@@ -99,3 +99,30 @@ void sendReading() {
 
   http.end();
 }
+
+void setup() {
+  Serial.begin(115200);
+
+#if !USE_SIMULATED_DATA
+  dht.begin();
+#endif
+
+  connectWiFi();
+
+  // Synchronize the clock to UTC using NTP
+  configTime(0, 0, "pool.ntp.org", "time.google.com");
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo, 15000)) {
+    Serial.println("NTP synchronization failed.");
+  }
+
+  sendReading();
+  previousMillis = millis();
+}
+
+void loop() {
+  if (millis() - previousMillis >= interval) {
+    previousMillis = millis();
+    sendReading();
+  }
+}
