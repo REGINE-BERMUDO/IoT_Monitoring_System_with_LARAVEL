@@ -147,3 +147,11 @@ void sendReading() {
 
   http.end();
 }
+
+void initHardware() {
+  pinMode(RESET_BUTTON_PIN, INPUT_PULLUP);
+
+#if !USE_SIMULATED_DATA
+  dht.begin();
+#endif
+}
