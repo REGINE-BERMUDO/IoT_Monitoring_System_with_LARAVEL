@@ -71,3 +71,12 @@ void connectWiFi() {
   Serial.print("Server URL: ");
   Serial.println(serverUrl);
 }
+
+void syncTime() {
+  // Synchronize the clock to UTC using NTP
+  configTime(0, 0, "pool.ntp.org", "time.google.com");
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo, 15000)) {
+    Serial.println("NTP synchronization failed.");
+  }
+}
